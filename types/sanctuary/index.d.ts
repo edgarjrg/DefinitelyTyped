@@ -8,7 +8,7 @@
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 // TypeScript Version: 2.8
 
-import { TR, TIS, TR2, TIS2 } from './TR';
+import { TR, TIS, TR2, TIS2, TypeIdent } from './TR';
 
 export type TK = any;  // temporary type used in unfinished type definitions
 
@@ -83,15 +83,17 @@ export interface Category<A> extends Semigroupoid<A, A> { }
 export interface Semigroup<A> { }
 export interface Monoid<A> extends Semigroup<A> { }
 export interface Functor<A> { }
-export interface Bifunctor<A, C> extends Functor<C> {
-  'fantasy-land/bimap'<B>(p: Fn<A, B>): <D>(q: Fn<C, D>) => (r: Bifunctor<A, C>) => Bifunctor<B, D>;
+export interface Bifunctor<LA, LB> extends Functor<LB> {
+  'fantasy-land/bimap'<LB>(
+    p: Fn<LA, LB>,
+  ): <RA, RB>(q: Fn<RA, RB>) => (r: Bifunctor<LA, RA>) => Bifunctor<LB, RB>;
 }
 export interface Bifunctor2<F extends TIS2> extends Functor<F> {
-  'fantasy-land/bimap'<LA, RA, LB, RB>(
-    f: Fn<LA, LB>,
-    g: Fn<RA, RB>,
-  ): TR2<F, LB, RB>;
+  'fantasy-land/bimap'<LA, LB>(
+    p: Fn<LA, LB>,
+  ): <RA, RB>(q: Fn<RA, RB>) => (r: TR2<F, LA, RA>) => TR2<F, LB, RB>;
 }
+
 export interface Profunctor<B, C> extends Functor<C> { }
 export interface Apply<A> extends Functor<A> { }
 export interface Applicative<A> extends Apply<A> { }
@@ -128,64 +130,80 @@ export interface MatchObj {
 }
 
 // Maybe
+export type MaybeTI = 'sanctuary-maybe/Maybe@1';
+
 declare module './TR' {
   interface TItoTR<A> {
     'sanctuary-maybe/Maybe@1': Maybe<A>;
   }
 }
 
-export interface Nothing {
+export interface Nothing extends Applicative1<MaybeTI>, TypeIdent<MaybeTI> {
   constructor: MaybeTypeRep;
+  isNothing: true;
+  isJus: false;
 }
 
-export interface Just<A> {
+export interface Just<A> extends Applicative1<MaybeTI>, TypeIdent<MaybeTI> {
   constructor: MaybeTypeRep;
   readonly value: A;
+  isNothing: false;
+  isJus: true;
 }
 
 export type Maybe<A> = Nothing | Just<A>;
 
-export type MaybeTI = 'sanctuary-maybe/Maybe@1';
-
-export interface MaybeTypeRep extends Applicative1<MaybeTI> {
-  <A>(value: A): Maybe<A>;
-  readonly '@@type': MaybeTI;
+export interface MaybeTypeRep {
+  Just<A = never>(value: A): Maybe<A>;
+  Nothing(): Maybe<never>;
+  'fantasy-land/of': MaybeTypeRep['Just'];
 }
 
 // Either
+export type EitherTI = 'sanctuary-either/Either@1';
+
 declare module './TR' {
   interface TItoTR2<L, R> {
     'sanctuary-either/Either@1': Either<L, R>;
   }
 }
 
-export type EitherTI = 'sanctuary-either/Either@1';
-
-export interface EitherTypeRep extends Applicative2<EitherTI>, Bifunctor2<EitherTI> {
-  <R>(value: R): Either<any, R>;
-  '@@type': EitherTI;
-}
-
-export interface Either<A, B> extends IOrd<Either<A, B>>, Bifunctor2<EitherTI> {
+export interface Right<R> extends Bifunctor2<EitherTI>, TypeIdent<EitherTI> {
   constructor: EitherTypeRep;
+  readonly value: R;
 }
+
+export interface Left<L = never>
+  extends Bifunctor2<EitherTI>,
+    TypeIdent<EitherTI> {
+  constructor: EitherTypeRep;
+  readonly value: L;
+}
+
+export interface EitherTypeRep {
+  Left<L = never>(value: L): Either<L, never>;
+  Right<R = never>(value: R): Either<never, R>;
+  'fantasy-land/of': EitherTypeRep['Right'];
+}
+
+export type Either<L, R> = Left<L> | Right<R>;
 
 // Pair
+export type PairTI = 'sanctuary-pair/Pair@1';
+
 declare module './TR' {
   interface TItoTR2<L, R> {
     'sanctuary-pair/Pair@1': Pair<L, R>;
   }
 }
 
-export type PairTI = 'sanctuary-pair/Pair@1';
-
 export interface PairTypeRep {
-  constructor: {
-    '@@type': 'sanctuary-pair/Pair@1';
-  };
 }
 
-export interface Pair<A, B> extends IOrd<Pair<A, B>>, Bifunctor2<PairTI> {
+export interface Pair<A, B>
+  extends IOrd<Pair<A, B>>,
+    Bifunctor2<PairTI>,
+    TypeIdent<PairTI> {
   constructor: PairTypeRep;
 }
 
@@ -226,8 +244,14 @@ export function map<A, B>(p: Fn<A, B>): {
   (q: Functor<A>): Functor<B>;
 };
 export function flip(tk: TK): (tk: TK) => TK;
-export function bimap<A, B>(p: Fn<A, B>): <C, D>(q: Fn<C, D>) => (r: Bifunctor<A, C>) => Bifunctor<B, D>;
-export function bimap<LA, LB>(p: Fn<LA, LB>): <RA, RB>(q: Fn<RA, RB>) => (r: TR2<any, LA, RA>) => TR2<any, LB, RB>;
+export function bimap<LA, LB>(
+  p: Fn<LA, LB>,
+): <RA, RB>(
+  q: Fn<RA, RB>,
+) => <I extends TR2<TIS2, LA, RA>>(r: I) => TR2<I['@@type'], LB, RB>;
+export function bimap<LA, LB>(
+  p: Fn<LA, LB>,
+): <RA, RB>(q: Fn<RA, RB>) => (r: Bifunctor<LA, RA>) => Bifunctor<LB, RB>;
 export function mapLeft<LA, LB>(p: Fn<LA, LB>): <R>(q: Bifunctor<LA, R>) => Bifunctor<LB, R>;
 export function promap<A, B>(p: Fn<A, B>): <C, D>(q: Fn<C, D>) => {
   (r: Fn<B, C>): Fn<A, D>;
@@ -318,8 +342,8 @@ export function mapMaybe(tk: TK): (tk: TK) => TK;
 export function maybeToEither<A>(p: A): <B>(q: Maybe<B>) => Either<A, B>;
 //  Either
 export const Either: EitherTypeRep;
-export function Left<A>(x: A): Either<A, any>;
-export function Right<A>(x: A): Either<any, A>;
+export function Left<A>(x: A): Either<A, never>;
+export function Right<A>(x: A): Either<never, A>;
 export function isLeft(p: Either<any, any>): boolean;
 export function isRight(p: Either<any, any>): boolean;
 export function fromEither<B>(p: B): (q: Either<any, B>) => B;

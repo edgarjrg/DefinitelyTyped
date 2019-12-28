@@ -1,6 +1,7 @@
 /// <reference types="node"/>
+
 import * as assert from "assert";
-import { create, env, Maybe, Just, Nothing } from "sanctuary";
+import { create, env, Maybe, Either, Just, MaybeTI } from 'sanctuary';
 
 const checkTypes = process.env["NODE_ENV"] !== "production";
 const S = create({ checkTypes, env });
@@ -14,7 +15,7 @@ assert.equal(S.zipWith(a => b => [a, b])([1, 2, 3])(['a', 'b', 'c']), [[1, 'a'],
 S.of(Array)(4); // $ExpectType number[]
 S.of(Function)(4)(null); // $ExpectType number
 S.of(S.Maybe)(4); // $ExpectType Maybe<number>
-S.of(S.Either)(4); // $ExpectType Either<any, number>
+S.of(S.Either)(4); // $ExpectType Either<never, number>
 
 ((): Maybe<number> => { // $ExpectType Maybe<number>
   const r = S.of(S.Maybe)(4); // $ExpectType Maybe<number>
@@ -23,5 +24,13 @@ S.of(S.Either)(4); // $ExpectType Either<any, number>
 
 S.id(Function)(42); // Category<any>
 
-S.bimap(S.toUpper)(Math.sqrt)(S.Left('foo')); // Either<string, number>
-S.bimap(S.toUpper)(Math.sqrt)(S.Pair('foo')(64)); // Pair<string, number>
+S.bimap(S.toUpper)(Math.sqrt)(S.Left('foo')); // $ExpectType Either<string, number>
+S.bimap(S.toUpper)(Math.sqrt)(S.Left('foo')); // $ExpectType Either<string, number>
+
+S.bimap(S.toUpper)(Math.sqrt)(S.Pair('foo')(64)); // $ExpectType Pair<string, number>
+
+S.Just<string>("X"); // $ExpectType Maybe<string>
+S.Left("X"); // $ExpectType Either<string, never>
+
+const x: Maybe<number> = S.Just("X"); // $ExpectError
+const y: Either<number, number> = S.Left("X"); // $ExpectError
