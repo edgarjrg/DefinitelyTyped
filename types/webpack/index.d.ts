@@ -1283,20 +1283,73 @@ declare namespace webpack {
 
         interface ChunkGroup {
             assets: string[];
-            chunks: number[];
+            chunks: Array<number | string>;
             children: Record<string, {
                 assets: string[];
-                chunks: number[];
+                chunks: Array<number | string>;
                 name: string;
             }>;
             childAssets: Record<string, string[]>;
             isOverSizeLimit?: boolean;
         }
+
+        type ReasonType
+            = 'amd define'
+            | 'amd require array'
+            | 'amd require context'
+            | 'amd require'
+            | 'cjs require context'
+            | 'cjs require'
+            | 'context element'
+            | 'delegated exports'
+            | 'delegated source'
+            | 'dll entry'
+            | 'accepted harmony modules'
+            | 'harmony accept'
+            | 'harmony export expression'
+            | 'harmony export header'
+            | 'harmony export imported specifier'
+            | 'harmony export specifier'
+            | 'harmony import specifier'
+            | 'harmony side effect evaluation'
+            | 'harmony init'
+            | 'import() context development'
+            | 'import() context production'
+            | 'import() eager'
+            | 'import() weak'
+            | 'import()'
+            | 'json exports'
+            | 'loader'
+            | 'module.hot.accept'
+            | 'module.hot.decline'
+            | 'multi entry'
+            | 'null'
+            | 'prefetch'
+            | 'require.context'
+            | 'require.ensure'
+            | 'require.ensure item'
+            | 'require.include'
+            | 'require.resolve'
+            | 'single entry'
+            | 'wasm export import'
+            | 'wasm import';
+
+        interface Reason {
+            moduleId: number | string | null;
+            moduleIdentifier: string | null;
+            module: string | null;
+            moduleName: string | null;
+            type: ReasonType;
+            explanation?: string;
+            userRequest: string;
+            loc: string;
+        }
+
         interface FnModules {
             assets?: string[];
             built: boolean;
             cacheable: boolean;
-            chunks: number[];
+            chunks: Array<number | string>;
             depth?: number;
             errors: number;
             failed: boolean;
@@ -1321,26 +1374,18 @@ declare namespace webpack {
             prefetched: boolean;
             profile: any; // TODO
             providedExports?: any; // TODO
-            reasons: {
-                explanation: string | undefined;
-                loc?: string;
-                module: string | null;
-                moduleId: number | string | null;
-                moduleIdentifier: string | null;
-                moduleName: string |  null;
-                type: any; // TODO
-                userRequest: any; // TODO
-            };
+            reasons: Reason[];
             size: number;
             source?: string;
             usedExports?: boolean;
             warnings: number;
         }
+
         interface ToJsonOutput {
             _showErrors: boolean;
             _showWarnings: boolean;
             assets?: Array<{
-                chunks: number[];
+                chunks: Array<number | string>;
                 chunkNames: string[];
                 emitted: boolean;
                 isOverSizeLimit?: boolean;
@@ -1349,7 +1394,7 @@ declare namespace webpack {
             }>;
             assetsByChunkName?: Record<string, Record<string, string[]>>;
             builtAt?: number;
-            children?: ToJsonOptions[] & { name?: string };
+            children?: Array<ToJsonOutput & { name?: string }>;
             chunks?: Array<{
                 children: number[];
                 childrenByOrder: Record<string, number[]>;
@@ -1357,7 +1402,7 @@ declare namespace webpack {
                 files: string[];
                 filteredModules?: boolean;
                 hash: string | undefined;
-                id: number;
+                id: number | string;
                 initial: boolean;
                 modules?: FnModules[];
                 names: string[];

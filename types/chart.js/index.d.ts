@@ -17,6 +17,8 @@
 //                 Adrián Caballero <https://github.com/adripanico>
 //                 wertzui <https://github.com/wertzui>
 //                 Martin Trobäck <https://github.com/lekoaf>
+//                 Elian Cordoba <https://github.com/ElianCordoba>
+//                 Takuya Uehara <https://github.com/indigolain>
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 // TypeScript Version: 2.3
 
@@ -124,7 +126,7 @@ declare namespace Chart {
 
     type PointStyle = 'circle' | 'cross' | 'crossRot' | 'dash' | 'line' | 'rect' | 'rectRounded' | 'rectRot' | 'star' | 'triangle';
 
-    type PositionType = 'left' | 'right' | 'top' | 'bottom';
+    type PositionType = 'left' | 'right' | 'top' | 'bottom' | 'chartArea';
 
     type InteractionMode = 'point' | 'nearest' | 'single' | 'label' | 'index' | 'x-axis' | 'dataset' | 'x' | 'y';
 
@@ -137,6 +139,8 @@ declare namespace Chart {
 
     type BorderAlignment = 'center' | 'inner';
 
+    type BorderWidth = number | { [key in PositionType]?: number };
+
     interface ChartArea {
         top: number;
         right: number;
@@ -148,6 +152,7 @@ declare namespace Chart {
         text?: string;
         fillStyle?: string;
         hidden?: boolean;
+        index?: number;
         lineCap?: 'butt' | 'round' | 'square';
         lineDash?: number[];
         lineDashOffset?: number;
@@ -158,7 +163,7 @@ declare namespace Chart {
     }
 
     interface ChartLegendLabelItem extends ChartLegendItem {
-        datasetIndex: number;
+        datasetIndex?: number;
     }
 
     interface ChartTooltipItem {
@@ -217,9 +222,9 @@ declare namespace Chart {
         datasets?: ChartDataSets[];
     }
 
-	interface RadialChartOptions extends ChartOptions {
-		scale?: RadialLinearScale;
-	}
+    interface RadialChartOptions extends ChartOptions {
+        scale?: RadialLinearScale;
+    }
 
     interface ChartSize {
         height: number;
@@ -243,6 +248,7 @@ declare namespace Chart {
         animation?: ChartAnimationOptions;
         elements?: ChartElementsOptions;
         layout?: ChartLayoutOptions;
+        scale?: RadialLinearScale;
         scales?: ChartScales;
         showLines?: boolean;
         spanGaps?: boolean;
@@ -431,6 +437,7 @@ declare namespace Chart {
 
     interface GridLineOptions {
         display?: boolean;
+        circular?: boolean;
         color?: ChartColor;
         borderDash?: number[];
         borderDashOffset?: number;
@@ -500,6 +507,8 @@ declare namespace Chart {
         display?: boolean;
         color?: ChartColor;
         lineWidth?: number;
+        borderDash?: number[];
+        borderDashOffset?: number;
     }
 
     interface PointLabelOptions {
@@ -508,6 +517,7 @@ declare namespace Chart {
         fontFamily?: string;
         fontSize?: number;
         fontStyle?: string;
+        lineHeight?: number|string;
     }
 
     interface LinearTickOptions extends TickOptions {
@@ -535,7 +545,7 @@ declare namespace Chart {
         cubicInterpolationMode?: 'default' | 'monotone';
         backgroundColor?: ChartColor | ChartColor[] | Scriptable<ChartColor>;
         borderAlign?: BorderAlignment | BorderAlignment[] | Scriptable<BorderAlignment>;
-        borderWidth?: number | number[] | Scriptable<number>;
+        borderWidth?: BorderWidth | BorderWidth[] | Scriptable<BorderWidth>;
         borderColor?: ChartColor | ChartColor[] | Scriptable<ChartColor>;
         borderCapStyle?: 'butt' | 'round' | 'square';
         borderDash?: number[];
@@ -660,11 +670,14 @@ declare namespace Chart {
         minUnit?: TimeUnit;
     }
 
-    interface RadialLinearScale extends LinearScale {
-        lineArc?: boolean;
+    interface RadialLinearScale {
+        animate?: boolean;
+        position?: PositionType;
         angleLines?: AngleLineOptions;
         pointLabels?: PointLabelOptions;
-        ticks?: TickOptions;
+        ticks?: LinearTickOptions;
+        display?: boolean;
+        gridLines?: GridLineOptions;
     }
 
     interface Point {

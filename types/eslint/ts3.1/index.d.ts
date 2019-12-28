@@ -386,6 +386,7 @@ export namespace Linter {
     }
 
     interface RuleOverride<Rules extends RulesRecord = RulesRecord> extends HasRules<Rules> {
+        extends?: string | string[];
         excludedFiles?: string[];
         files?: string[];
     }
@@ -404,7 +405,7 @@ export namespace Linter {
     }
 
     interface ParserOptions {
-        ecmaVersion?: 3 | 5 | 6 | 7 | 8 | 9 | 2015 | 2016 | 2017 | 2018;
+        ecmaVersion?: 3 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 2015 | 2016 | 2017 | 2018 | 2019 | 2020;
         sourceType?: 'script' | 'module';
         ecmaFeatures?: {
             globalReturn?: boolean;
@@ -448,11 +449,13 @@ export namespace Linter {
         messages: LintMessage[];
     }
 
-    type ParserModule = {
-        parse(text: string, options?: any): AST.Program;
-    } | {
-        parseForESLint(text: string, options?: any): ESLintParseResult;
-    };
+    type ParserModule =
+        | {
+              parse(text: string, options?: any): AST.Program;
+          }
+        | {
+              parseForESLint(text: string, options?: any): ESLintParseResult;
+          };
 
     interface ESLintParseResult {
         ast: AST.Program;
