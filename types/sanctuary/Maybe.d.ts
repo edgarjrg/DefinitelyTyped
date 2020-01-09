@@ -2,6 +2,7 @@ import { TypeIdent } from './TR';
 import { Setoid1 } from './Setoid';
 import { Applicative1 } from './Applicative';
 import { Showable } from './Showable';
+import { Alt1 } from './Alt';
 // Maybe
 export type MaybeTI = 'sanctuary-maybe/Maybe@1';
 declare module './TR' {
@@ -12,21 +13,26 @@ declare module './TR' {
 export type Nothing = TypeIdent<MaybeTI> &
     Applicative1<MaybeTI> &
     Showable &
-    Setoid1 & {
+    Setoid1 &
+    Alt1<MaybeTI> & {
         constructor: MaybeTypeRep;
         isNothing: true;
         isJus: false;
     };
+
 export type Just<A> = TypeIdent<MaybeTI> &
     Applicative1<MaybeTI> &
     Setoid1 &
-    Showable & {
+    Showable &
+    Alt1<MaybeTI> & {
         constructor: MaybeTypeRep;
         readonly value: A;
         isNothing: false;
         isJus: true;
     };
+
 export type Maybe<A> = Nothing | Just<A>;
+
 export interface MaybeTypeRep {
     Just<A = never>(value: A): Maybe<A>;
     Nothing(): Maybe<never>;

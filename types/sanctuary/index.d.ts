@@ -8,8 +8,8 @@
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 // TypeScript Version: 2.8
 
-import { TR2, TIS2 } from './TR';
-import { Fn, Fn2, Fn2_, Fn3, Fn3_, Fn4, Fn4_, Fn5, Fn5_, Predicate, Thunk } from './function.';
+import { TR2, TIS2, TR, TIS } from './TR';
+import { Fn, Fn2, Fn2_, Fn3, Fn3_, Fn4, Fn4_, Fn5, Fn5_, Predicate, Thunk } from './function';
 
 import {
     FiniteNumber,
@@ -40,7 +40,7 @@ import { Applicative, Applicative1, Applicative2 } from './Applicative';
 import { Chain } from './Chain';
 import { ChainRec } from './ChainRec';
 import { Monad } from './Monad';
-import { Alt } from './Alt';
+import { Alt, Alt1 } from './Alt';
 import { Plus } from './Plus';
 import { Alternative } from './Alternative';
 import { Foldable } from './Foldable';
@@ -162,6 +162,8 @@ export function promap<A, B>(p: Fn<A, B>): <C, D>(q: Fn<C, D>) => {
   (r: Fn<B, C>): Fn<A, D>;
   (r: Profunctor<B, C>): Profunctor<A, D>;
 };
+export function alt(x: TR<TIS, never>): <I extends TR<TIS, any>>(y: I) => I;
+export function alt<I extends TR<TIS, any>>(x: I): (y: I) => I;
 export function alt<A>(x: Alt<A>): (y: Alt<A>) => Alt<A>;
 export function zero(p: TypeRep): Plus<any>;
 export function reduce<A, B>(p: Fn2<B, A, B>): (q: B) => (r: ReadonlyArray<A> | StrMap<A> | Maybe<A> | Either<any, A> | Foldable<A>) => B;
