@@ -8,204 +8,111 @@
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 // TypeScript Version: 2.8
 
-import { TR, TIS, TR2, TIS2, TypeIdent } from './TR';
+import { TR2, TIS2 } from './TR';
+import { Fn, Fn2, Fn2_, Fn3, Fn3_, Fn4, Fn4_, Fn5, Fn5_, Predicate, Thunk } from './function.';
 
-export type TK = any;  // temporary type used in unfinished type definitions
+import {
+    FiniteNumber,
+    Integer,
+    NonNegativeInteger,
+    NonZeroFiniteNumber,
+    Nullable,
+    StrMap,
+    TK,
+    TypeRep,
+    ValidNumber,
+    Radix,
+    RegexFlags,
+} from './aliases';
 
-export type Nullable<A> = A | null;
+import { ArraySetoid, ISetoid, Setoid, Setoid1 } from './Setoid';
 
-export type Thunk<A> = () => A;
+import { ArrayOrd, IOrd, Ord } from './Ord';
+import { Semigroupoid } from './Semigroupoid';
+import { Category } from './Category';
+import { Semigroup } from './Semigroup';
+import { Monoid } from './Monoid';
+import { Functor } from './Functor';
+import { Bifunctor2, Bifunctor } from './Bifunctor';
+import { Profunctor } from './Profunctor';
+import { Apply } from './Apply';
+import { Applicative, Applicative1, Applicative2 } from './Applicative';
+import { Chain } from './Chain';
+import { ChainRec } from './ChainRec';
+import { Monad } from './Monad';
+import { Alt } from './Alt';
+import { Plus } from './Plus';
+import { Alternative } from './Alternative';
+import { Foldable } from './Foldable';
+import { Traversable } from './Traversable';
+import { Extend } from './Extend';
+import { Comonad } from './Comonad';
+import { Contravariant } from './Contravariant';
+import { Showable } from './Showable';
+import { MatchObj } from './MatchObj';
+import { Maybe as _Maybe, MaybeTypeRep, Nothing as _Nothing, Just } from './Maybe';
+import { Either as _Either, EitherTypeRep, Left, Right } from './Either';
+import { Pair as _Pair, PairTypeRep } from './Pair';
 
-export type Fn<A, B> = (a: A) => B;
-export type Fn2<A, B, C> = (a: A) => (b: B) => C;
-export type Fn3<A, B, C, D> = (a: A) => (b: B) => (c: C) => D;
-export type Fn4<A, B, C, D, E> = (a: A) => (b: B) => (c: C) => (d: D) => E;
-export type Fn5<A, B, C, D, E, F> = (a: A) => (b: B) => (c: C) => (d: D) => (e: E) => F;
-export type Fn2_<A, B, C> = (a: A, b: B) => C;
-export type Fn3_<A, B, C, D> = (a: A, b: B, c: C) => D;
-export type Fn4_<A, B, C, D, E> = (a: A, b: B, c: C, d: D) => E;
-export type Fn5_<A, B, C, D, E, F> = (a: A, b: B, c: C, d: D, e: E) => F;
-
-export type Predicate<A> = (a: A) => boolean;
-
-export interface StrMap<A> { [k: string]: A; }
-
-export type ValidNumber = number;
-export type FiniteNumber = number;
-export type NonZeroFiniteNumber = number;
-export type Integer = number;
-export type NonNegativeInteger = number;
-
-export interface TypeRep { }
-
-export interface ISetoid<A> {
-  'fantasy-land/equals'(other: A): boolean;
-}
-//  `fantasy-land/equals` implementations are provided for the following
-//  built-in types: Null, Undefined, Boolean, Number, Date, RegExp, String,
-//  Array, Arguments, Error, Object, and Function.
-export type Setoid<A>
-  = null
-  | undefined
-  | boolean
-  | number
-  | Date
-  | RegExp
-  | string
-  | ArraySetoid<A>
-  | Error
-  | StrMap<A>
-  // tslint:disable-next-line:ban-types
-  | Function
-  | ISetoid<A>;
-export interface ArraySetoid<A> extends Array<Setoid<A>> { }
-
-export interface IOrd<A> extends ISetoid<A> {
-  'fantasy-land/lte'(other: A): boolean;
-}
-//  `fantasy-land/lte` implementations are provided for the following
-//  built-in types: Null, Undefined, Boolean, Number, Date, String,
-//  Array, Arguments, and Object.
-export type Ord<A>
-  = null
-  | undefined
-  | boolean
-  | number
-  | Date
-  | string
-  | ArrayOrd<A>
-  | StrMap<A>
-  | IOrd<A>;
-export interface ArrayOrd<A> extends Array<Ord<A>> { }
-
-export interface Semigroupoid<A, B> { }
-export interface Category<A> extends Semigroupoid<A, A> { }
-export interface Semigroup<A> { }
-export interface Monoid<A> extends Semigroup<A> { }
-export interface Functor<A> { }
-export interface Bifunctor<LA, LB> extends Functor<LB> {
-  'fantasy-land/bimap'<LB>(
-    p: Fn<LA, LB>,
-  ): <RA, RB>(q: Fn<RA, RB>) => (r: Bifunctor<LA, RA>) => Bifunctor<LB, RB>;
-}
-export interface Bifunctor2<F extends TIS2> extends Functor<F> {
-  'fantasy-land/bimap'<LA, LB>(
-    p: Fn<LA, LB>,
-  ): <RA, RB>(q: Fn<RA, RB>) => (r: TR2<F, LA, RA>) => TR2<F, LB, RB>;
-}
-
-export interface Profunctor<B, C> extends Functor<C> { }
-export interface Apply<A> extends Functor<A> { }
-export interface Applicative<A> extends Apply<A> { }
-export interface Applicative1<F extends TIS> extends Apply<F> {
-  readonly 'fantasy-land/of': <A>(a: A) => TR<F, A>;
-}
-export interface Applicative2<F extends TIS2> extends Apply<F> {
-  readonly 'fantasy-land/of': <R>(value: R) => TR2<F, any, R>;
-}
-export interface Chain<A> extends Apply<A> { }
-export interface ChainRec<A> extends Chain<A> { }
-export interface Monad<A> extends Applicative<A>, Chain<A> { }
-export interface Alt<A> extends Functor<A> { }
-export interface Plus<A> extends Alt<A> { }
-export interface Alternative<A> extends Applicative<A>, Plus<A> { }
-export interface Foldable<A> { }
-export interface Traversable<A> extends Functor<A>, Foldable<A> { }
-export interface Extend<A> extends Functor<A> { }
-export interface Comonad<A> extends Extend<A> { }
-export interface Contravariant<A> { }
-
-export type Radix
-  = 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
-  | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17
-  | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25
-  | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33
-  | 34 | 35 | 36;
-
-export type RegexFlags = '' | 'g' | 'i' | 'm' | 'gi' | 'gm' | 'im' | 'gim';
-
-export interface MatchObj {
-  match: string;
-  groups: Array<Maybe<string>>;
-}
-
-// Maybe
-export type MaybeTI = 'sanctuary-maybe/Maybe@1';
-
-declare module './TR' {
-  interface TItoTR<A> {
-    'sanctuary-maybe/Maybe@1': Maybe<A>;
-  }
-}
-
-export interface Nothing extends Applicative1<MaybeTI>, TypeIdent<MaybeTI> {
-  constructor: MaybeTypeRep;
-  isNothing: true;
-  isJus: false;
-}
-
-export interface Just<A> extends Applicative1<MaybeTI>, TypeIdent<MaybeTI> {
-  constructor: MaybeTypeRep;
-  readonly value: A;
-  isNothing: false;
-  isJus: true;
-}
-
-export type Maybe<A> = Nothing | Just<A>;
-
-export interface MaybeTypeRep {
-  Just<A = never>(value: A): Maybe<A>;
-  Nothing(): Maybe<never>;
-  'fantasy-land/of': MaybeTypeRep['Just'];
-}
-
-// Either
-export type EitherTI = 'sanctuary-either/Either@1';
-
-declare module './TR' {
-  interface TItoTR2<L, R> {
-    'sanctuary-either/Either@1': Either<L, R>;
-  }
-}
-
-export interface Right<R> extends Bifunctor2<EitherTI>, TypeIdent<EitherTI> {
-  constructor: EitherTypeRep;
-  readonly value: R;
-}
-
-export interface Left<L = never>
-  extends Bifunctor2<EitherTI>,
-    TypeIdent<EitherTI> {
-  constructor: EitherTypeRep;
-  readonly value: L;
-}
-
-export interface EitherTypeRep {
-  Left<L = never>(value: L): Either<L, never>;
-  Right<R = never>(value: R): Either<never, R>;
-  'fantasy-land/of': EitherTypeRep['Right'];
-}
-
-export type Either<L, R> = Left<L> | Right<R>;
-
-// Pair
-export type PairTI = 'sanctuary-pair/Pair@1';
-
-declare module './TR' {
-  interface TItoTR2<L, R> {
-    'sanctuary-pair/Pair@1': Pair<L, R>;
-  }
-}
-
-export interface PairTypeRep {
-}
-
-export interface Pair<A, B>
-  extends IOrd<Pair<A, B>>,
-    Bifunctor2<PairTI>,
-    TypeIdent<PairTI> {
-  constructor: PairTypeRep;
-}
+export {
+    Fn,
+    Fn2,
+    Fn2_,
+    Fn3,
+    Fn3_,
+    Fn4,
+    Fn4_,
+    Fn5,
+    Fn5_,
+    Predicate,
+    Thunk,
+    FiniteNumber,
+    Integer,
+    NonNegativeInteger,
+    NonZeroFiniteNumber,
+    Nullable,
+    StrMap,
+    TK,
+    TypeRep,
+    ValidNumber,
+    Radix,
+    RegexFlags,
+    ArraySetoid,
+    ISetoid,
+    Setoid,
+    Setoid1,
+    ArrayOrd,
+    IOrd,
+    Ord,
+    Semigroupoid,
+    Category,
+    Semigroup,
+    Monoid,
+    Functor,
+    Bifunctor,
+    Bifunctor2,
+    Profunctor,
+    Apply,
+    Applicative,
+    Applicative1,
+    Applicative2,
+    Chain,
+    ChainRec,
+    Monad,
+    Alt,
+    Plus,
+    Alternative,
+    Foldable,
+    Traversable,
+    Extend,
+    Comonad,
+    Contravariant,
+    Showable,
+    MatchObj,
+    Just,
+    Right,
+    Left,
+};
 
 //  Classify
 export function type(x: any): {
@@ -215,7 +122,7 @@ export function type(x: any): {
 };
 export function is(tk: TK): (tk: TK) => TK;
 //  Showable
-export function show(tk: TK): TK;
+export function show(tr: Showable): string;
 //  Fantasy Land
 export function equals<A extends Setoid<any>>(x: A): (y: A) => boolean;
 export function lt<A extends Ord<any>>(x: A): (y: A) => boolean;
@@ -245,10 +152,8 @@ export function map<A, B>(p: Fn<A, B>): {
 };
 export function flip(tk: TK): (tk: TK) => TK;
 export function bimap<LA, LB>(
-  p: Fn<LA, LB>,
-): <RA, RB>(
-  q: Fn<RA, RB>,
-) => <I extends TR2<TIS2, LA, RA>>(r: I) => TR2<I['@@type'], LB, RB>;
+    p: Fn<LA, LB>,
+): <RA, RB>(q: Fn<RA, RB>) => <I extends TR2<TIS2, LA, RA>>(r: I) => TR2<I['@@type'], LB, RB>;
 export function bimap<LA, LB>(
   p: Fn<LA, LB>,
 ): <RA, RB>(q: Fn<RA, RB>) => (r: Bifunctor<LA, RA>) => Bifunctor<LB, RB>;
@@ -321,6 +226,7 @@ export function pipe(tk: TK): (tk: TK) => TK;
 export function pipeK(tk: TK): (tk: TK) => TK;
 export function on<A, B, C>(p: Fn2<B, B, C>): (q: Fn<A, B>) => (r: A) => Fn<A, C>;
 //  Pair
+export type Pair<A, B> = _Pair<A, B>;
 export function Pair<A>(x: A): <B>(y: B) => Pair<A, B>;
 export function pair<A, B, C>(f: Fn2<A, B, C>): (p: Pair<A, B>) => C;
 export function fst<A>(p: Pair<A, any>): A;
@@ -328,7 +234,9 @@ export function snd<B>(p: Pair<any, B>): B;
 export function swap<A, B>(p: Pair<A, B>): Pair<B, A>;
 //  Maybe
 export const Maybe: MaybeTypeRep;
-export const Nothing: Maybe<any>;
+export type Maybe<A> = _Maybe<A>;
+export const Nothing: Maybe<never>;
+export type Nothing = _Nothing;
 export function Just<A>(x: A): Maybe<A>;
 export function isNothing(p: Maybe<any>): boolean;
 export function isJust(p: Maybe<any>): boolean;
@@ -342,6 +250,7 @@ export function mapMaybe(tk: TK): (tk: TK) => TK;
 export function maybeToEither<A>(p: A): <B>(q: Maybe<B>) => Either<A, B>;
 //  Either
 export const Either: EitherTypeRep;
+export type Either<L, R> = _Either<L, R>;
 export function Left<A>(x: A): Either<A, never>;
 export function Right<A>(x: A): Either<never, A>;
 export function isLeft(p: Either<any, any>): boolean;
